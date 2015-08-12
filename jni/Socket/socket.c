@@ -55,7 +55,7 @@ int CreateSocket(const char *ip, int port)
 	return 1;
 }
 
-int SocketSends(int *data, int len, int port)
+int SocketSend(char *data, int len, int port)
 {
 	int SocketPortNumber = port - PORT_NUMBER;
 
@@ -68,16 +68,17 @@ int SocketSends(int *data, int len, int port)
 	 return 1;
 }
 
-int SocketReceives(int* data, int len, int port)
+char* SocketReceive(int port)
 {
 	int retval;
 	int SocketPortNumber = port - PORT_NUMBER;
+	char Rev[SOCKET_BUF];
 
-	retval = recv(SocketList[SocketPortNumber].sockfd, data, len, 0);
+	retval = recv(SocketList[SocketPortNumber].sockfd, Rev, SOCKET_BUF, 0);
 	if (retval == -1)
 	   LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "Receive Error.");
 
-	LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "%d", data[0]);
+	return Rev;
 }
 
 void SocketStop(int port)
