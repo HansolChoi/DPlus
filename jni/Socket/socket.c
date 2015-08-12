@@ -20,7 +20,7 @@ typedef struct Socket
 Socket SocketList[SOCKETMAX];
 char server_addr[30];
 
-int CreateSocket(int ip, int port)
+int CreateSocket(const char *ip, int port)
 {
 	int CreateSockfd;
 	int SocketPortNumber = port - PORT_NUMBER;
