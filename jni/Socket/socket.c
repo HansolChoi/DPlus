@@ -9,8 +9,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
-#include "socket.h"
-// hahaha
+
 typedef struct Socket
 {
 	char buf[SOCKET_BUF];
