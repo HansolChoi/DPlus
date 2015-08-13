@@ -1,5 +1,9 @@
 package CommandLineTool;
 
-public class CommandLineTool {
+import Socket.Socket;
 
+public class CommandLineTool {
+	Socket socket;
+	
+	
 }

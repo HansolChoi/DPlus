@@ -13,18 +13,22 @@
 
 typedef struct Socket
 {
+	char buf[SOCKET_BUF];
 	int sockfd;
 	struct sockaddr_in svr_addr;
 }Socket;
 
 Socket SocketList[SOCKETMAX];
+char ip[30] = "220.118.64.153";
 char server_addr[30];
 
-int CreateSocket(const char *ip, int port)
+int CreateSocket(JNIEnv *env, jobject thiz, jint port)
 {
 	int CreateSockfd;
 	int SocketPortNumber = port - PORT_NUMBER;
 	struct hostent *pHostEnt;
+
+	LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "Socket Start");
 
 	strcat(server_addr, ip);
 	SocketList[SocketPortNumber].sockfd = CreateSockfd = socket(PF_INET, SOCK_STREAM, 0);
@@ -50,7 +54,6 @@ int CreateSocket(const char *ip, int port)
 		return 0;
 	}
 
-	CurrentSocketNumber++;
 	LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "Connect to the Server successfully.");
 	return 1;
 }
@@ -59,7 +62,7 @@ int SocketSend(char *data, int len, int port)
 {
 	int SocketPortNumber = port - PORT_NUMBER;
 
-	if (write(SocketList[SocketPortNumber].sockfd, str, len) < 0)
+	if (write(SocketList[SocketPortNumber].sockfd, data, len) < 0)
 	{
 	   LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "Writing Error.");
 	   fsync(SocketList[SocketPortNumber].sockfd);
@@ -72,19 +75,17 @@ char* SocketReceive(int port)
 {
 	int retval;
 	int SocketPortNumber = port - PORT_NUMBER;
-	char Rev[SOCKET_BUF];
 
-	retval = recv(SocketList[SocketPortNumber].sockfd, Rev, SOCKET_BUF, 0);
+	retval = recv(SocketList[SocketPortNumber].sockfd, SocketList[SocketPortNumber].buf, SOCKET_BUF, 0);
 	if (retval == -1)
 	   LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "Receive Error.");
 
-	return Rev;
+	return SocketList[SocketPortNumber].buf;
 }
 
-void SocketStop(int port)
+void SocketStop(JNIEnv *env, jobject thiz, jint port)
 {
 	int SocketNumber = port - PORT_NUMBER;
 
-	if(SocketList[SocketNumber].port == port)
-		close(SocketList[SocketNumber].sockfd);
+	close(SocketList[SocketNumber].sockfd);
 }

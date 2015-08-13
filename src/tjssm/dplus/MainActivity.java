@@ -2,12 +2,17 @@ package tjssm.dplus;
 
 import android.app.Activity;
 import android.os.Bundle;
+import Socket.Socket;
 
 public class MainActivity extends Activity {
-	   
+	Socket socket;
+	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		socket.Create(5000);
+
+		socket.Stop(5000);
 	}
 }

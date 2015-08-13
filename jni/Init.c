@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
+//#include "Socket/socket.h"
+
 #define PAKAGE_CLASS_NAME	"Socket/Socket"
 
 JavaVM *glpVM = NULL;
@@ -16,7 +18,7 @@ jclass cls;
 
 // [2stage] This function table make to register in JIN environment.
 static JNINativeMethod methods[] = {
-		{"CreateSocket", "(Ljava/lang/String;I)I", (void*)CreateSocket },
+		{"CreateSocket", "(I)I", (void*)CreateSocket},
 		{"SocketSend", "(Ljava/lang/String;II)I", (void*)SocketSend},
 		{"SocketReceive", "(I)Ljava/lang/String;", (void*)SocketReceive},
 		{"SocketStop", "(I)V", (void*)SocketStop},
@@ -27,6 +29,8 @@ static JNINativeMethod methods[] = {
 jint JNI_OnLoad(JavaVM* vm, void* reserved){
 	jint result = -1;
 	JNIEnv* env = NULL;
+
+	__android_log_print(ANDROID_LOG_INFO, "NATIVE", "Native registration process.");
 
 	if((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_4) != JNI_OK){
 		__android_log_print(ANDROID_LOG_INFO, "NATIVE", "GetEnv failed.\n");
