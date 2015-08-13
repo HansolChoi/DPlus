@@ -11,8 +11,8 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		socket.Create(5000);
+		socket.Create();
 
-		socket.Stop(5000);
+		socket.Stop();
 	}
 }

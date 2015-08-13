@@ -10,7 +10,7 @@
 #include <netdb.h>
 
 #include "socket.h"
-
+// hahaha
 typedef struct Socket
 {
 	char buf[SOCKET_BUF];
@@ -19,10 +19,11 @@ typedef struct Socket
 }Socket;
 
 Socket SocketList[SOCKETMAX];
-char ip[30] = "220.118.64.153";
+char ip[30] = "220.118.64.159";
 char server_addr[30];
+int port = 5000;
 
-int CreateSocket(JNIEnv *env, jobject thiz, jint port)
+int CreateSocket(JNIEnv *env, jobject thiz)
 {
 	int CreateSockfd;
 	int SocketPortNumber = port - PORT_NUMBER;
@@ -83,7 +84,7 @@ char* SocketReceive(int port)
 	return SocketList[SocketPortNumber].buf;
 }
 
-void SocketStop(JNIEnv *env, jobject thiz, jint port)
+void SocketStop(JNIEnv *env, jobject thiz)
 {
 	int SocketNumber = port - PORT_NUMBER;
 

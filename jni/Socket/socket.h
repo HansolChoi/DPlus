@@ -7,9 +7,9 @@
 #define SOCKETMAX	30
 #define SOCKET_BUF	1024
 
-int CreateSocket(JNIEnv *env, jobject thiz, jint port);
+int CreateSocket(JNIEnv *env, jobject thiz);
 int SocketSend(char *data, int len, int port);
 char* SocketReceive(int port);
-void SocketStop(JNIEnv *env, jobject thiz, jint port);
+void SocketStop(JNIEnv *env, jobject thiz);
 
 #endif

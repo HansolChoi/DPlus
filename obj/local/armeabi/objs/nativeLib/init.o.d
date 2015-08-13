@@ -57,7 +57,8 @@
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/fcntl.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/asm/fcntl.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/asm-generic/fcntl.h \
- /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/uio.h
+ /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/uio.h \
+ /cygdrive/c/users/hansol/workspace2/DPlus/jni/Socket/socket.h
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/string.h:
 
@@ -174,3 +175,5 @@
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/asm-generic/fcntl.h:
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/uio.h:
+
+/cygdrive/c/users/hansol/workspace2/DPlus/jni/Socket/socket.h:

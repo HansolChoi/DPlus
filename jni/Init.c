@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-//#include "Socket/socket.h"
+#include "Socket/socket.h"
 
 #define PAKAGE_CLASS_NAME	"Socket/Socket"
 
@@ -18,10 +18,10 @@ jclass cls;
 
 // [2stage] This function table make to register in JIN environment.
 static JNINativeMethod methods[] = {
-		{"CreateSocket", "(I)I", (void*)CreateSocket},
+		{"CreateSocket", "(V)V", (void*)CreateSocket},
 		{"SocketSend", "(Ljava/lang/String;II)I", (void*)SocketSend},
 		{"SocketReceive", "(I)Ljava/lang/String;", (void*)SocketReceive},
-		{"SocketStop", "(I)V", (void*)SocketStop},
+		{"SocketStop", "(V)V", (void*)SocketStop},
 };
 
 // [1stage] If Android class NDK_Onload library call, JIN_OnLoad function is executed.

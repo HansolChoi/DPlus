@@ -5,13 +5,13 @@ public class Socket {
         System.loadLibrary("nativeLib");
     }
     
-    public native int CreateSocket(int port);
+    public native int CreateSocket();
     public native int SocketSend(String data, int len, int port);
     public native String SocketReceive(int port);
-    public native void SocketStop(int port);
+    public native void SocketStop();
 	
-    public int Create(int port){
-    	CreateSocket(port);
+    public int Create(){
+    	CreateSocket();
     	return 1;
     }
     
@@ -23,7 +23,7 @@ public class Socket {
     	return SocketReceive(port);
     }
     
-    public void Stop(int port){
-    	SocketStop(port);
+    public void Stop(){
+    	SocketStop();
     }
 }
