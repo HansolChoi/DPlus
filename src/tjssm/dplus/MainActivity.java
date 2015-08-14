@@ -9,8 +9,7 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import tjssm.NativeCaller.*;
+import tjssm.ServerListen.*;
 
 public class MainActivity extends Activity implements OnClickListener 
 {
@@ -24,7 +23,7 @@ public class MainActivity extends Activity implements OnClickListener
     public static   TextView        user_level;
     public static   TextView        system_level;
     public static   TextView        amount_level;
-    public NativeCaller native_caller;
+    NativeCaller native_caller;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) 
@@ -70,6 +69,8 @@ public class MainActivity extends Activity implements OnClickListener
         // event transaction
         connect_button      .setOnClickListener(this);
         disconnect_button   .setOnClickListener(this);
+        
+        native_caller = new NativeCaller();
     }
 
     @Override

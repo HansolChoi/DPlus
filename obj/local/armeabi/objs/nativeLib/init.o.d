@@ -1,5 +1,5 @@
-/cygdrive/c/users/hansol/workspace2/DPlus/obj/local/armeabi/objs/nativeLib/init.o: \
- /cygdrive/c/users/hansol/workspace2/DPlus/jni/init.c \
+/cygdrive/c/Users/hansol/workspace2/DPlus/obj/local/armeabi/objs/nativeLib/init.o: \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/init.c \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/string.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/sys/cdefs.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/sys/cdefs_elf.h \
@@ -58,7 +58,7 @@
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/asm/fcntl.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/asm-generic/fcntl.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/uio.h \
- /cygdrive/c/users/hansol/workspace2/DPlus/jni/Socket/socket.h
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/Socket/socket.h
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/string.h:
 
@@ -176,4 +176,4 @@
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/uio.h:
 
-/cygdrive/c/users/hansol/workspace2/DPlus/jni/Socket/socket.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/Socket/socket.h:
