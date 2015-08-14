@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
+#include "socket.h"
 
 typedef struct Socket
 {
@@ -18,17 +19,13 @@ typedef struct Socket
 }Socket;
 
 Socket SocketList[SOCKETMAX];
-char ip[30] = "220.118.64.159";
 char server_addr[30];
-int port = 5000;
 
-int CreateSocket(JNIEnv *env, jobject thiz)
+int CreateSocket(char* ip, int port)
 {
 	int CreateSockfd;
 	int SocketPortNumber = port - PORT_NUMBER;
 	struct hostent *pHostEnt;
-
-	LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "Socket Start");
 
 	strcat(server_addr, ip);
 	SocketList[SocketPortNumber].sockfd = CreateSockfd = socket(PF_INET, SOCK_STREAM, 0);
@@ -83,7 +80,7 @@ char* SocketReceive(int port)
 	return SocketList[SocketPortNumber].buf;
 }
 
-void SocketStop(JNIEnv *env, jobject thiz)
+void SocketStop(int port)
 {
 	int SocketNumber = port - PORT_NUMBER;
 

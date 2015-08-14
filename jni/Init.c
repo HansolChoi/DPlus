@@ -18,10 +18,7 @@ jclass cls;
 
 // [2stage] This function table make to register in JIN environment.
 static JNINativeMethod methods[] = {
-		{"CreateSocket", "(V)V", (void*)CreateSocket},
-		{"SocketSend", "(Ljava/lang/String;II)I", (void*)SocketSend},
-		{"SocketReceive", "(I)Ljava/lang/String;", (void*)SocketReceive},
-		{"SocketStop", "(V)V", (void*)SocketStop},
+
 };
 
 // [1stage] If Android class NDK_Onload library call, JIN_OnLoad function is executed.
