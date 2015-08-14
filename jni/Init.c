@@ -17,9 +17,16 @@ jclass jObject;
 jmethodID funccb;
 jclass cls;
 
-void ServerCommandListen(JNIEnv* env, jobject thiz)
+void ServerCommandListen(JNIEnv* env, jobject thiz, jstring _ip, jint port)
 {
+	const char *ip;
+	ip= (*env)->GetStringUTFChars(env, _ip, NULL); // Java String to C Style string
+
 	LOG(ANDROID_LOG_INFO, "NATIVE", "ServerCommandListen is called.");
+
+	CreateSocket(ip, port);
+	SocketSend("hansol's first message", 23, port);
+	SocketStop(port);
 }
 
 void LogcatExtract(JNIEnv* env, jobject thiz)
@@ -43,7 +50,7 @@ void NativeServiceStop(JNIEnv* env, jobject thiz)
 }
 
 static JNINativeMethod methods[] = {
-		{ "ServerCommandListen", "()V", (void*)ServerCommandListen },
+		{ "ServerCommandListen", "(Ljava/lang/String;I)V", (void*)ServerCommandListen },
 		{ "LogcatExcute", "()V", (void*)LogcatExtract },
 		{ "CommandLineTool", "()V", (void*)CommandLineTool },
 		{ "ResourceExtract", "()V", (void*)ResourceExtract },

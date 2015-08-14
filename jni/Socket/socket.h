@@ -7,7 +7,7 @@
 #define SOCKETMAX	30
 #define SOCKET_BUF	1024
 
-int CreateSocket(char* ip, int port);
+int CreateSocket(const char* ip, int port);
 int SocketSend(char *data, int len, int port);
 char* SocketReceive(int port);
 void SocketStop(int port);

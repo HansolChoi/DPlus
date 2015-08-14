@@ -7,7 +7,7 @@ public class NativeCaller {
 		System.loadLibrary("nativeLib");
 	}
 	
-	public native void ServerCommandListen();
+	public native void ServerCommandListen(String ip, int port);
 	public native void LogcatExcute();
 	public native void CommandLineTool();
 	public native void ResourceExtract();

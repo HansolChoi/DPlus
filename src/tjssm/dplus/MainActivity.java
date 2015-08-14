@@ -58,7 +58,7 @@ public class MainActivity extends Activity implements OnClickListener
         amount_level    .setGravity(Gravity.CENTER);
 
         // data setting
-        ip_field            .setText("210.118.64.165");
+        ip_field            .setText("210.118.64.159");
         user_level			.setText("0%");
         system_level		.setText("0KB");
         amount_level        .setText("0%");
@@ -79,7 +79,7 @@ public class MainActivity extends Activity implements OnClickListener
         switch(v.getId()) 
         {
             case R.id.connect_button:
-            	native_caller.ServerCommandListen();
+            	native_caller.ServerCommandListen("210.118.64.159", 5000);
             	native_caller.LogcatExcute();
             	native_caller.CommandLineTool();
             	native_caller.ResourceExtract();

@@ -8,6 +8,9 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <netinet/in.h>
 
 #include "socket.h"
 
@@ -21,7 +24,7 @@ typedef struct Socket
 Socket SocketList[SOCKETMAX];
 char server_addr[30];
 
-int CreateSocket(char* ip, int port)
+int CreateSocket(const char* ip, int port)
 {
 	int CreateSockfd;
 	int SocketPortNumber = port - PORT_NUMBER;
@@ -32,7 +35,7 @@ int CreateSocket(char* ip, int port)
 
 	if(CreateSockfd < 0)
 	{
-		LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "Socket Creation Error: socketfd = %d", SocketList[SocketPortNumber].sockfd);
+		LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "Socket Creation Error");
 	 	return 0;
 	}
 
@@ -44,7 +47,6 @@ int CreateSocket(char* ip, int port)
 	pHostEnt = gethostbyname(server_addr);
 	SocketList[SocketPortNumber].svr_addr.sin_addr.s_addr = inet_addr(inet_ntoa(*((struct in_addr *)pHostEnt->h_addr)));
 
-	// connet() need to plan about blocking
 	if(connect(CreateSockfd, (struct sockaddr*)&SocketList[SocketPortNumber].svr_addr, sizeof(SocketList[SocketPortNumber].svr_addr)) < 0)
 	{
 		LOG(ANDROID_LOG_DEBUG, "DEBUGGING", "Can't connect to the Server.");
