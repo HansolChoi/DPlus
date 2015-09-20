@@ -1,15 +1,20 @@
-package tjssm.dplus;
+package dplus;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import tjssm.ServerListen.*;
+import tjssm.dplus.R;
+import NativeService.*;
+import Shell.*;
 
 public class MainActivity extends Activity implements OnClickListener 
 {
@@ -23,7 +28,8 @@ public class MainActivity extends Activity implements OnClickListener
     public static   TextView        user_level;
     public static   TextView        system_level;
     public static   TextView        amount_level;
-    NativeCaller native_caller;
+    public InputDevice 	input;
+    public int ScreenWidth, ScreenHeight;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) 
@@ -33,8 +39,9 @@ public class MainActivity extends Activity implements OnClickListener
 
         // Component Initialized
         Component_Init();
+        
     }
-
+    
     public void Component_Init() 
     {
         // init
@@ -58,7 +65,7 @@ public class MainActivity extends Activity implements OnClickListener
         amount_level    .setGravity(Gravity.CENTER);
 
         // data setting
-        ip_field            .setText("210.118.64.159");
+        ip_field            .setText("0");
         user_level			.setText("0%");
         system_level		.setText("0KB");
         amount_level        .setText("0%");
@@ -70,22 +77,30 @@ public class MainActivity extends Activity implements OnClickListener
         connect_button      .setOnClickListener(this);
         disconnect_button   .setOnClickListener(this);
         
-        native_caller = new NativeCaller();
+        GetWindow(); // 스크린 사이즈 구하기
+        input = new InputDevice();
     }
 
+    public void GetWindow()
+    {
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+		ScreenWidth = displayMetrics.widthPixels;
+		ScreenHeight = displayMetrics.heightPixels;
+		Log.d("GetWindow", "Width" + ScreenWidth + ", Height" + ScreenHeight);
+    }
+    
     @Override
     public void onClick(View v) 
     {
         switch(v.getId()) 
         {
-            case R.id.connect_button:
-            	native_caller.ServerCommandListen("210.118.64.159", 5000);
-            	native_caller.LogcatExcute();
-            	native_caller.CommandLineTool();
-            	native_caller.ResourceExtract();
+            case R.id.connect_button: 
+            	input.RecordStart(ScreenWidth, ScreenHeight);
+            	//input.PlayInputTest(ScreenWidth, ScreenHeight);
                 break;
             case R.id.disconnect_button:
-            	native_caller.NativeServiceStop();
+            	input.RecordStop();
                 break;
         }
     }

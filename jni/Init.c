@@ -6,61 +6,85 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <pthread.h>
+#include "InputDevice/input.h"
 
-#include "Socket/socket.h"
-
-#define PAKAGE_CLASS_NAME	"tjssm/ServerListen/NativeCaller"
+#define PAKAGE_CLASS_NAME	"NativeService/InputDevice"
 #define LOG	__android_log_print
+#define I	ANDROID_LOG_INFO
 
 JavaVM *glpVM = NULL;
-jclass jObject;
-jmethodID funccb;
+JNIEnv* env = NULL;
 jclass cls;
 
-void ServerCommandListen(JNIEnv* env, jobject thiz, jstring _ip, jint port)
+int Recording_thr_id;
+int Playing_thr_id;
+pthread_t Recording_thread;
+pthread_t Playing_thread;
+int RecordingThreadFlag;
+int PlayingThreadFlag;
+
+char EventFileName[30];
+int ScreenWidth, ScreenHeight;
+
+void *Recording_function(void *data)
 {
-	const char *ip;
-	ip= (*env)->GetStringUTFChars(env, _ip, NULL); // Java String to C Style string
-
-	LOG(ANDROID_LOG_INFO, "NATIVE", "ServerCommandListen is called.");
-
-	CreateSocket(ip, port);
-	SocketSend("hansol's first message", 23, port);
-	SocketStop(port);
+	ReadingLoop(EventFileName, &RecordingThreadFlag, ScreenWidth, ScreenHeight);
 }
 
-void LogcatExtract(JNIEnv* env, jobject thiz)
+void *Playing_function(void *data)
 {
-	LOG(ANDROID_LOG_INFO, "NATIVE", "LogcatExtract is called.");
+	PlayingLoop(EventFileName, &RecordingThreadFlag, ScreenWidth, ScreenHeight);
 }
 
-void CommandLineTool(JNIEnv* env, jobject thiz)
+void RecordStart(JNIEnv *R_Env, jobject thiz, jint Width, jint Height)
 {
-	LOG(ANDROID_LOG_INFO, "NATIVE", "CommandLineTool is called.");
+	RecordingThreadFlag = 1;
+	int  EventNumber;
+
+	EventNumber = MatchingEventDevice();
+	sprintf(EventFileName, "/dev/input/event%d", EventNumber);
+	LOG(ANDROID_LOG_INFO, "THREAD", "%s", EventFileName);
+
+	ScreenWidth = Width; ScreenHeight = Height;
+	EvenvDeviceAuthorityChange(env, EventFileName);
+
+	Recording_thr_id = pthread_create(&Recording_thread, NULL, Recording_function, (void *)NULL);
+	if(Recording_thr_id < 0)
+		LOG(ANDROID_LOG_INFO, "THREAD", "Create thread fail.\n");
 }
 
-void ResourceExtract(JNIEnv* env, jobject thiz)
+void RecordStop()
 {
-	LOG(ANDROID_LOG_INFO, "NATIVE", "ResourceExtract is called.");
+	RecordingThreadFlag = 0;
 }
 
-void NativeServiceStop(JNIEnv* env, jobject thiz)
+void PlayInputTest(JNIEnv *R_Env, jobject thiz, jint Width, jint Height)
 {
-	LOG(ANDROID_LOG_INFO, "NATIVE", "NativeServiceStop is called.");
+	PlayingThreadFlag = 1;
+	int  EventNumber;
+
+	EventNumber = MatchingEventDevice();
+	sprintf(EventFileName, "/dev/input/event%d", EventNumber);
+	LOG(ANDROID_LOG_INFO, "THREAD", "%s", EventFileName);
+
+	ScreenWidth = Width; ScreenHeight = Height;
+	EvenvDeviceAuthorityChange(env, EventFileName);
+
+	Playing_thr_id = pthread_create(&Playing_thread, NULL, Playing_function, (void *)NULL);
+	if(Playing_thr_id < 0)
+		LOG(ANDROID_LOG_INFO, "THREAD", "Create thread fail.\n");
 }
 
 static JNINativeMethod methods[] = {
-		{ "ServerCommandListen", "(Ljava/lang/String;I)V", (void*)ServerCommandListen },
-		{ "LogcatExcute", "()V", (void*)LogcatExtract },
-		{ "CommandLineTool", "()V", (void*)CommandLineTool },
-		{ "ResourceExtract", "()V", (void*)ResourceExtract },
-		{ "NativeServiceStop", "()V", (void*)NativeServiceStop },
+		{"PlayInputTest", "(II)V", (void*)PlayInputTest},
+		{"RecordStart", "(II)V", (void*)RecordStart},
+		{"RecordStop", "()V", (void*)RecordStop},
 };
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	jint result = -1;
-	JNIEnv* env = NULL;
 
 	if((*vm)->GetEnv(vm, (void**)&env, JNI_VERSION_1_4) != JNI_OK)
 	{
@@ -71,14 +95,12 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 	cls = (*env)->FindClass(env, PAKAGE_CLASS_NAME);
 	if(cls == NULL)
 	{
-		LOG(ANDROID_LOG_INFO, "NATIVE", "Native registration unable to find class(AVMJni)");
+		LOG(ANDROID_LOG_INFO, "NATIVE", "Native registration unable to find class(InputDevice)");
 		goto error;
 	}
 
-	// Native connect.
-	if((*env)->RegisterNatives(env, cls, methods, sizeof(methods)/sizeof(methods[0]))<0)
-	{
-		LOG(ANDROID_LOG_INFO, "NATIVE", "RegisterNatives failed !!!\n");
+	if((*env)->RegisterNatives(env, cls, methods, sizeof(methods)/sizeof(methods[0])) < 0){
+		LOG(ANDROID_LOG_INFO, "NATIVE", "Native function registration fail.");
 		goto error;
 	}
 
