@@ -87,7 +87,7 @@ public class MainActivity extends Activity implements OnClickListener
 		getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 		ScreenWidth = displayMetrics.widthPixels;
 		ScreenHeight = displayMetrics.heightPixels;
-		Log.d("GetWindow", "Width" + ScreenWidth + ", Height" + ScreenHeight);
+		//Log.d("GetWindow", "Width" + ScreenWidth + ", Height" + ScreenHeight);
     }
     
     @Override
@@ -96,11 +96,11 @@ public class MainActivity extends Activity implements OnClickListener
         switch(v.getId()) 
         {
             case R.id.connect_button: 
-            	input.RecordStart(ScreenWidth, ScreenHeight);
-            	//input.PlayInputTest(ScreenWidth, ScreenHeight);
+            	//input.RecordStart(ScreenWidth, ScreenHeight);
+            	input.PlayInputTest(ScreenWidth, ScreenHeight);
                 break;
             case R.id.disconnect_button:
-            	input.RecordStop();
+            	//input.RecordStop();
                 break;
         }
     }

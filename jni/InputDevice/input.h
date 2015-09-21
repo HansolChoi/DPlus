@@ -10,5 +10,6 @@ void GetSceenResolution(JNIEnv* env, int* width, int* height);
 void JavaShellEnv(JNIEnv* env);
 void JavaShell(JNIEnv* env, const char* param);
 void ReadingLoop(const char* event, int* flag, int ScreenWidth, int ScreenHeight);
+void PlayingLoop(const char* file, int* flag, int ScreenWidth, int ScreenHeight );
 
 #endif
