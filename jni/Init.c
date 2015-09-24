@@ -12,7 +12,11 @@
 #include "InputDevice/record.h"
 #include "InputDevice/replay.h"
 
-#define PAKAGE_CLASS_NAME	"NativeService/InputDevice"
+#include "Resource/logcat.h"
+#include "Resource/resource.h"
+#include "Resource/socket.h"
+
+#define PAKAGE_CLASS_NAME	"NativeService/NativeService"
 #define LOG	__android_log_print
 #define I	ANDROID_LOG_INFO
 
@@ -80,10 +84,35 @@ void PlayInputTest(JNIEnv *R_Env, jobject thiz, jint Width, jint Height)
 		LOG(I, "PlayInputTest", "Create thread fail.\n");
 }
 
+
+// This function transfer data to Android MainActivity.
+// Function parameter mean that index of resource array.
+// Display(2) return resource[2] *100. Multiple 100 make bottom action.
+// (3.12) *100 -> 312 -> 312/100 = 3.12
+jint Display(JNIEnv *env, jobject thiz, jint index)
+{
+	if(index == 1)
+		return (int)(resource[index] * 100);
+	return (int)(resource[index]);
+}
+
+void SocketsInitCall(JNIEnv *env, jobject thiz, jstring jip)
+{
+	const char *ip;
+	ip= (*env)->GetStringUTFChars(env, jip, NULL); // Java String to C Style string
+
+	SocketsInit(ip);
+}
+
 static JNINativeMethod methods[] = {
 		{"PlayInputTest", "(II)V", (void*)PlayInputTest},
 		{"RecordStart", "(II)V", (void*)RecordStart},
 		{"RecordStop", "()V", (void*)RecordStop},
+		{"nativeSocketInit", "(Ljava/lang/String;)V", (void*)SocketsInitCall },
+		{"nativeSocketClose", "()V", (void*)SocketsDestroy},
+		{"nativeResourceTransfer", "()V", (void*)SocketsTransfer},
+		{"nativeDisplay", "(I)I", (void*)Display},
+		{"nativewaitpid", "()V", (void*)_waitpid},
 };
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved)

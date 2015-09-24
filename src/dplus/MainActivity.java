@@ -13,8 +13,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import tjssm.dplus.R;
-import NativeService.*;
-import Shell.*;
+
+import Socket.*;
 
 public class MainActivity extends Activity implements OnClickListener 
 {
@@ -28,8 +28,9 @@ public class MainActivity extends Activity implements OnClickListener
     public static   TextView        user_level;
     public static   TextView        system_level;
     public static   TextView        amount_level;
-    public InputDevice 	input;
-    public int ScreenWidth, ScreenHeight;
+    
+    public static ClientSocket singleton_socket = ClientSocket.getInstance();
+    public static int ScreenWidth, ScreenHeight;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) 
@@ -78,7 +79,6 @@ public class MainActivity extends Activity implements OnClickListener
         disconnect_button   .setOnClickListener(this);
         
         GetWindow(); // 스크린 사이즈 구하기
-        input = new InputDevice();
     }
 
     public void GetWindow()
@@ -87,21 +87,43 @@ public class MainActivity extends Activity implements OnClickListener
 		getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 		ScreenWidth = displayMetrics.widthPixels;
 		ScreenHeight = displayMetrics.heightPixels;
-		//Log.d("GetWindow", "Width" + ScreenWidth + ", Height" + ScreenHeight);
     }
-    
+
     @Override
     public void onClick(View v) 
     {
         switch(v.getId()) 
         {
             case R.id.connect_button: 
-            	input.RecordStart(ScreenWidth, ScreenHeight);
+            	requestConnect();
                 break;
             case R.id.disconnect_button:
-            	input.RecordStop();
-            	input.PlayInputTest(ScreenWidth, ScreenHeight);
+            	requestDisconnect();
                 break;
         }
     }
+    
+    public static void requestConnect(){
+        try {                	
+            if(ClientSocket.isConnected == false) {                    
+            	singleton_socket.socket_init(Build.MODEL, ip_field.getText().toString());
+                singleton_socket.socket_opened();
+                if(ClientSocket.isConnected == true) server_status.setText("연결됨");
+                else server_status.setText("열결실패");
+            }                    
+        }
+        catch(Exception e) { e.printStackTrace(); }
+    }
+
+    public static void requestDisconnect(){
+        try {                	
+            if(ClientSocket.isConnected == true ) {                    	
+                singleton_socket.socket_closed();
+                if(ClientSocket.isConnected == false) server_status.setText("연결끊어짐");                        
+            }                   
+        }
+        catch(Exception e) { e.printStackTrace(); }
+    }
 }
+
+
