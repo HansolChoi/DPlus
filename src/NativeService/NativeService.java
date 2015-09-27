@@ -16,23 +16,21 @@ public class NativeService{
     public static int SocketAvailable = 0;
     public static float cpu_msg, bat_msg;
     public static int mem_msg;
+    public static int device_width, device_height;
     
 	static{
 		System.loadLibrary("NativeService");
 	}
 
-	public native void PlayInputTest(int Width, int Height);
+	public native void PlayInputTest(int Origin_Width, int Origin_Height, 
+			int Device_Width, int Device_Height);
 	public native void RecordStart(int Width, int Height);
 	public native void RecordStop();
 	
     public native void nativeSocketInit(String ip);
     public native void nativeSocketClose();
-    public native void nativeResourceTransfer();
     public native int nativeDisplay(int index);
     
- // Parent process detect to die(child) using signal. 
-    public native void nativewaitpid();
-
     public void Display(){
     	cpu_msg = nativeDisplay(1)/100;
     	

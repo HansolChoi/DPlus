@@ -21,7 +21,7 @@ typedef struct Socket{
 Socket socket_system_resource;
 Socket socket_logcat;
 
-void SocketsInit(const char* ip);
+int SocketsInit(const char* ip);
 int SocketsDestroy();
 void SocketsTransfer();
 

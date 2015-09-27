@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.StrictMode;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -12,9 +15,10 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import tjssm.dplus.R;
-
 import Socket.*;
+import NativeService.*;
 
 public class MainActivity extends Activity implements OnClickListener 
 {
@@ -31,18 +35,38 @@ public class MainActivity extends Activity implements OnClickListener
     
     public static ClientSocket singleton_socket = ClientSocket.getInstance();
     public static int ScreenWidth, ScreenHeight;
+    public static Context m_context;
     
+	public static String ToastMessage;
+	public static Handler handler;
+	
+	public NativeService ns;
+    public int test;
     @Override
     protected void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        m_context = this;
+        Thread_Handling();
 
         // Component Initialized
         Component_Init();
-        
+    }
+
+    @Override
+    protected void onDestroy() {
+    	singleton_socket.socket_closed();
+        super.onDestroy();
     }
     
+    public void Thread_Handling() {
+        if(Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy  policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+    }
+
     public void Component_Init() 
     {
         // init
@@ -66,7 +90,7 @@ public class MainActivity extends Activity implements OnClickListener
         amount_level    .setGravity(Gravity.CENTER);
 
         // data setting
-        ip_field            .setText("0");
+        ip_field            .setText("192.168.137.16"/*"1.214.224.77"*/);
         user_level			.setText("0%");
         system_level		.setText("0KB");
         amount_level        .setText("0%");
@@ -78,6 +102,8 @@ public class MainActivity extends Activity implements OnClickListener
         connect_button      .setOnClickListener(this);
         disconnect_button   .setOnClickListener(this);
         
+        ns = new NativeService();
+        test = 0;
         GetWindow(); // 스크린 사이즈 구하기
     }
 
@@ -88,21 +114,31 @@ public class MainActivity extends Activity implements OnClickListener
 		ScreenWidth = displayMetrics.widthPixels;
 		ScreenHeight = displayMetrics.heightPixels;
     }
-
+    
+ 
     @Override
     public void onClick(View v) 
     {
         switch(v.getId()) 
         {
-            case R.id.connect_button: 
-            	requestConnect();
+            case R.id.connect_button:
+            	ns.RecordStart(ScreenWidth, ScreenHeight);
+            	//requestConnect();
+            	/*if(test == 0){
+            		test = 1;
+            		Log.i("onClick", "testing");
+            		ns.PlayInputTest(ScreenWidth, ScreenHeight, ScreenWidth, ScreenHeight);
+            		Log.i("onClick", "test end");
+            		test = 0;
+            	}*/
                 break;
             case R.id.disconnect_button:
-            	requestDisconnect();
+            	ns.RecordStop();
+            	//requestDisconnect();
                 break;
         }
     }
-    
+
     public static void requestConnect(){
         try {                	
             if(ClientSocket.isConnected == false) {                    
@@ -124,6 +160,22 @@ public class MainActivity extends Activity implements OnClickListener
         }
         catch(Exception e) { e.printStackTrace(); }
     }
+    
+    
+    public static void toast(String message) {
+        ToastMessage = message;
+  
+        try {
+            handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                public void run() {
+                    Toast.makeText(MainActivity.m_context, ToastMessage, Toast.LENGTH_SHORT)
+                            .show();
+                }
+            });
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
-
-

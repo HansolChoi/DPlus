@@ -64,6 +64,7 @@ void EventDeviceAuthorityChange(JNIEnv* env, const char* file)
 	JavaShell(env, "su"); // 루트권한 획득
 	strcat(chmod, file);
 	JavaShell(env, chmod); // 권한 변경
+	LOG(ANDROID_LOG_INFO, "EventDeviceAuthorityChange", "권한변경했어.");
 }
 
 /*
@@ -71,33 +72,38 @@ void EventDeviceAuthorityChange(JNIEnv* env, const char* file)
  */
 void JavaShellEnv(JNIEnv* env)
 {
+	LOG(ANDROID_LOG_INFO, "JavaShellEnv", "클래스 찾기");
 	// 클래스  찾기
 	sh_cls = (*env)->FindClass(env, "Shell/ShellReceiver");
 	if(sh_cls == NULL){
-		LOG(ANDROID_LOG_INFO, "NATIVE", "클래스 검색 실패");
+		LOG(ANDROID_LOG_INFO, "JavaShellEnv", "클래스 검색 실패");
 		return;
 	}
 
+	LOG(ANDROID_LOG_INFO, "JavaShellEnv", "생성자 찾기");
 	// 생성자 찾기
 	func = (*env)->GetMethodID(env, sh_cls, "<init>", "()V");
 	if(func == NULL){
-		LOG(ANDROID_LOG_INFO, "NATIVE", "생성자를 못찾음");
+		LOG(ANDROID_LOG_INFO, "JavaShellEnv", "생성자를 못찾음");
 		return;
 	}
 
+	LOG(ANDROID_LOG_INFO, "JavaShellEnv", "객체 생성");
 	// 객체 생성
 	sh_obj = (*env)->NewObject(env, sh_cls, func);
 	if(sh_obj == NULL){
-		LOG(ANDROID_LOG_INFO, "NATIVE", "객체 생성 실패");
+		LOG(ANDROID_LOG_INFO, "JavaShellEnv", "객체 생성 실패");
 		return;
 	}
 
+	LOG(ANDROID_LOG_INFO, "JavaShellEnv", "메소드 호출");
 	// 객체의 메소드 호출
 	func = (*env)->GetMethodID(env, sh_cls, "ShellCmd", "(Ljava/lang/String;)V");
 	if(func == NULL){
-		LOG(ANDROID_LOG_INFO, "NATIVE", "객체 메소드 찾기 실패");
+		LOG(ANDROID_LOG_INFO, "JavaShellEnv", "객체 메소드 찾기 실패");
 		return;
 	}
+	LOG(ANDROID_LOG_INFO, "JavaShellEnv", "자바쉘 등록완료");
 }
 
 /*

@@ -15,7 +15,35 @@
 
 #define STORAGE_PATH	"/sdcard/events.txt"
 
-void Replay(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight)
+int OriginWidth, OriginHeight, DeviceWidth, DeviceHeight;
+
+void EventPos(struct input_event *event)
+{
+	if(event->type == EV_ABS){
+		if(event->code == ABS_MT_POSITION_X)
+		{
+			event->value = event->value * DeviceWidth / OriginWidth;
+		}
+		else if(event->code == ABS_MT_POSITION_Y)
+		{
+			event->value = event->value * DeviceHeight / OriginHeight;
+		}
+	}
+}
+
+void EventSet(struct input_event *event, int type, int code, int value)
+{
+	struct timeval now;
+
+	gettimeofday(&now, NULL);
+	event->time = now;
+	event->type = type;
+	event->code = code;
+	event->value = value;
+}
+
+void Replay(const char* EventPath, int* flag,
+		int _OriginWidth, int _OriginHeight, int _DeviceWidth, int _DeviceHeight)
 {
 	int event_fd = -1;
 	int record_fd = -1;
@@ -25,6 +53,9 @@ void Replay(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight)
 	int i, outputdev;
 	int num_events;
 	struct stat statinfo;
+
+	OriginWidth = _OriginWidth; OriginHeight = _OriginHeight;
+	DeviceWidth = _DeviceWidth; DeviceHeight = _DeviceHeight;
 
 	LOG(I, "Replay", "replay start");
 
@@ -61,7 +92,7 @@ void Replay(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight)
 			LOG(I, "Replay", "read error");
 			break;
 		}
-		LOG(I, "Replay", "type : %d, code : %d value : %d", event.type, event.code, event.value);
+		LOG(I, "Replay", "pre - type : %d, code : %d value : %ld", event.type, event.code, event.value);
 
 		gettimeofday(&now, NULL);
 		if (!timerisset(&tdiff)) {
@@ -75,12 +106,32 @@ void Replay(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight)
 
 		event.time = tevent;
 
+		EventPos(&event);
+
+		//LOG(I, "Replay", "post - type : %d, code : %d value : %d", event.type, event.code, event.value);
 		if(write(event_fd, &event, sizeof(event)) != sizeof(event)){
 			LOG(I, "Replay", "write error");
 			break;
 		}
 	}
 
+	/*EventSet(&event, EV_SYN, 0 , 0);
+	if(write(event_fd, &event, sizeof(event)) != sizeof(event)){
+		LOG(I, "Replay", "write error");
+	}
+	LOG(I, "Replay", "write Sync");
+
+	EventSet(&event, EV_KEY, 330, 0);
+	if(write(event_fd, &event, sizeof(event)) != sizeof(event)){
+		LOG(I, "Replay", "write error");
+	}
+	LOG(I, "Replay", "write up");
+
+	EventSet(&event, EV_SYN, 0 , 0);
+	if(write(event_fd, &event, sizeof(event)) != sizeof(event)){
+		LOG(I, "Replay", "write error");
+	}
+	LOG(I, "Replay", "write Sync");*/
 	close(event_fd);
 	close(record_fd);
 	LOG(I, "Replay", "replay stop");

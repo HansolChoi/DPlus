@@ -1,5 +1,5 @@
-/cygdrive/c/Users/hansol/workspace2/Dplus/obj/local/armeabi/objs/NativeService/Resource/socket.o: \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/socket.c \
+/cygdrive/c/Users/hansol/workspace2/DPlus/obj/local/armeabi/objs/NativeService/Resource/socket.o: \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/socket.c \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/jni.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/sys/cdefs.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/sys/cdefs_elf.h \
@@ -71,8 +71,8 @@
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/asm-generic/sockios.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/sockios.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/netdb.h \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/resource.h \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/socket.h \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/resource.h \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/socket.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/arpa/inet.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/netinet/in.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/netinet/in6.h \
@@ -84,7 +84,7 @@
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/swab.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/asm/swab.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/ipv6.h \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/logcat.h
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/logcat.h
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/jni.h:
 
@@ -228,9 +228,9 @@
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/netdb.h:
 
-/cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/resource.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/resource.h:
 
-/cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/socket.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/socket.h:
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/arpa/inet.h:
 
@@ -254,4 +254,4 @@
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/ipv6.h:
 
-/cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/logcat.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/logcat.h:

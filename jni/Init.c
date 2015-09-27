@@ -26,22 +26,40 @@ jclass cls;
 
 int Recording_thr_id;
 int Playing_thr_id;
+int Socket_thr_id;
+
 pthread_t Recording_thread;
 pthread_t Playing_thread;
+pthread_t Socket_thread;
+
 int RecordingThreadFlag;
 int PlayingThreadFlag;
+int SocketThreadFlag;
 
 char EventFileName[30];
-int ScreenWidth, ScreenHeight;
+int DeviceWidth, DeviceHeight;
+int OriginWidth, OriginHeight;
+int record_loop = 0;
+
+void *Socket_function(void *data)
+{
+	while(SocketThreadFlag)
+	{
+		_waitpid();
+		SocketsTransfer();
+		usleep(200000);
+	}
+}
 
 void *Recording_function(void *data)
 {
-	Record(EventFileName, &RecordingThreadFlag, ScreenWidth, ScreenHeight);
+	LOG(I, "Recording_function", "스레드 시작해.");
+	Record(EventFileName, &RecordingThreadFlag, DeviceWidth, DeviceHeight, &record_loop);
 }
 
 void *Playing_function(void *data)
 {
-	Replay(EventFileName, &RecordingThreadFlag, ScreenWidth, ScreenHeight);
+	Replay(EventFileName, &RecordingThreadFlag, OriginWidth, OriginHeight, DeviceWidth, DeviceHeight);
 }
 
 void RecordStart(JNIEnv *R_Env, jobject thiz, jint Width, jint Height)
@@ -49,13 +67,14 @@ void RecordStart(JNIEnv *R_Env, jobject thiz, jint Width, jint Height)
 	RecordingThreadFlag = 1;
 	int  EventNumber;
 
-	ScreenWidth = Width; ScreenHeight = Height;
+	/**/
 	EventNumber = MatchingEventDevice();
-
 	sprintf(EventFileName, "/dev/input/event%d", EventNumber);
-	LOG(I, "RecordStart", "%s", EventFileName);
-
+	LOG(I, "SocketsInitCall", "%s", EventFileName);
 	EventDeviceAuthorityChange(env, EventFileName);
+	/* */
+
+	DeviceWidth = Width; DeviceHeight = Height;
 
 	Recording_thr_id = pthread_create(&Recording_thread, NULL, Recording_function, (void *)NULL);
 	if(Recording_thr_id < 0)
@@ -65,30 +84,65 @@ void RecordStart(JNIEnv *R_Env, jobject thiz, jint Width, jint Height)
 void RecordStop()
 {
 	RecordingThreadFlag = 0;
+
+	// 파일이 닫힐 때까지 기다린다.
+	while(record_loop != 0){
+		usleep(200000);
+	}
 }
 
-void PlayInputTest(JNIEnv *R_Env, jobject thiz, jint Width, jint Height)
+void PlayInputTest(JNIEnv *R_Env, jobject thiz, jint Origin_Width, jint Origin_Height, jint Device_Width, jint Device_Height)
 {
 	PlayingThreadFlag = 1;
 	int  EventNumber;
 
+	LOG(I, "PlayInputTest", "Play!~~!\n");
+	OriginWidth = Origin_Width, OriginHeight = Origin_Height;
+	DeviceWidth = Device_Width; DeviceHeight = Device_Height;
+
+	/* */
 	EventNumber = MatchingEventDevice();
 	sprintf(EventFileName, "/dev/input/event%d", EventNumber);
-	LOG(I, "PlayInputTest", "%s", EventFileName);
-
-	ScreenWidth = Width; ScreenHeight = Height;
+	LOG(I, "SocketsInitCall", "%s", EventFileName);
 	EventDeviceAuthorityChange(env, EventFileName);
+	/* */
 
 	Playing_thr_id = pthread_create(&Playing_thread, NULL, Playing_function, (void *)NULL);
 	if(Playing_thr_id < 0)
 		LOG(I, "PlayInputTest", "Create thread fail.\n");
 }
 
+void SocketsInitCall(JNIEnv *R_Env, jobject thiz, jstring jip)
+{
+	const char *ip;
+	int  EventNumber;
+	ip= (*R_Env)->GetStringUTFChars(R_Env, jip, NULL); // Java String to C Style string
+	LOG(I, "SocketsInitCall", "ReleaseString remove");
+	LOG(I, "SocketsInitCall", "SocketsInitCall and ip : %s", ip);
+	if(SocketsInit(ip) == 0)
+	{
+		LOG(I, "SocketsInitCall", "SocketsInit fail");
+		return;
+	}
+	LOG(I, "SocketsInitCall", "SocketsInit(ip)\n");
+	SocketThreadFlag = 1;
 
-// This function transfer data to Android MainActivity.
-// Function parameter mean that index of resource array.
-// Display(2) return resource[2] *100. Multiple 100 make bottom action.
-// (3.12) *100 -> 312 -> 312/100 = 3.12
+	EventNumber = MatchingEventDevice();
+	sprintf(EventFileName, "/dev/input/event%d", EventNumber);
+	LOG(I, "SocketsInitCall", "%s", EventFileName);
+	EventDeviceAuthorityChange(env, EventFileName);
+
+	Socket_thr_id = pthread_create(&Socket_thread, NULL, Socket_function, (void *)NULL);
+	if(Playing_thr_id < 0)
+		LOG(I, "SocketsInitCall", "Create thread fail.\n");
+}
+
+void SocketClose(JNIEnv *R_Env, jobject thiz)
+{
+	SocketThreadFlag = 0;
+	SocketsDestroy();
+}
+
 jint Display(JNIEnv *env, jobject thiz, jint index)
 {
 	if(index == 1)
@@ -96,23 +150,13 @@ jint Display(JNIEnv *env, jobject thiz, jint index)
 	return (int)(resource[index]);
 }
 
-void SocketsInitCall(JNIEnv *env, jobject thiz, jstring jip)
-{
-	const char *ip;
-	ip= (*env)->GetStringUTFChars(env, jip, NULL); // Java String to C Style string
-
-	SocketsInit(ip);
-}
-
 static JNINativeMethod methods[] = {
-		{"PlayInputTest", "(II)V", (void*)PlayInputTest},
+		{"PlayInputTest", "(IIII)V", (void*)PlayInputTest},
 		{"RecordStart", "(II)V", (void*)RecordStart},
 		{"RecordStop", "()V", (void*)RecordStop},
 		{"nativeSocketInit", "(Ljava/lang/String;)V", (void*)SocketsInitCall },
-		{"nativeSocketClose", "()V", (void*)SocketsDestroy},
-		{"nativeResourceTransfer", "()V", (void*)SocketsTransfer},
+		{"nativeSocketClose", "()V", (void*)SocketClose},
 		{"nativeDisplay", "(I)I", (void*)Display},
-		{"nativewaitpid", "()V", (void*)_waitpid},
 };
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved)

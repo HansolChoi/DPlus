@@ -21,13 +21,16 @@ int CreateSocket(Socket* SocketObj, int port);
 void SocketStop(Socket* SocketObj);
 int SocketSends(Socket* SocketObj, float *data, int len);
 
-void SocketsInit(const char* ip)
+int SocketsInit(const char* ip)
 {
 	memset(server_addr,0,sizeof(server_addr));
 	strcat(server_addr, ip);
+	 __android_log_print(ANDROID_LOG_DEBUG, "DEBUGGING", "copy ip : %s", server_addr);
 
-	CreateSocket(&socket_system_resource, PORT2);
-	CreateSocket(&socket_logcat, PORT4);
+	if(CreateSocket(&socket_system_resource, PORT2) == 0)
+		return 0;
+	if(CreateSocket(&socket_logcat, PORT4) == 0)
+		return 0;
 	LogcatStdoutChange(socket_logcat.sockfd);
 	LogcatExcute();
 }
@@ -48,6 +51,8 @@ void SocketsTransfer()
 }
 
 int CreateSocket(Socket* SocketObj, int port){
+	 struct hostent *pHostEnt;
+
 	 SocketObj->sockfd = socket(PF_INET, SOCK_STREAM, 0);
 	 if(SocketObj->sockfd < 0) {
 		 __android_log_print(ANDROID_LOG_DEBUG, "DEBUGGING", "Socket Creation Error: socketfd = %d", SocketObj->sockfd);
@@ -57,12 +62,21 @@ int CreateSocket(Socket* SocketObj, int port){
 	 }
 
 	 memset(&SocketObj->svr_addr, 0, sizeof(struct sockaddr_in));
+	 __android_log_print(ANDROID_LOG_DEBUG, "DEBUGGING", "Socket Created 1.");
 
 	 SocketObj->svr_addr.sin_family = AF_INET;
+	 __android_log_print(ANDROID_LOG_DEBUG, "DEBUGGING", "Socket Created 2.");
+
 	 SocketObj->svr_addr.sin_port = htons(port);
 
-	 struct hostent *pHostEnt;
+	 __android_log_print(ANDROID_LOG_DEBUG, "DEBUGGING", "Socket Created 3.");
+
 	 pHostEnt = gethostbyname(server_addr);
+	 __android_log_print(ANDROID_LOG_DEBUG, "DEBUGGING", "Socket Created 4.");
+	 if(pHostEnt == NULL){
+		 __android_log_print(ANDROID_LOG_DEBUG, "DEBUGGING", "pHostEnt is null.");
+		 return 0;
+	 }
 	 SocketObj->svr_addr.sin_addr.s_addr = inet_addr(inet_ntoa(*((struct in_addr *)pHostEnt->h_addr)));
 
 	 __android_log_print(ANDROID_LOG_DEBUG, "DEBUGGING", "connect prepare...");
@@ -77,8 +91,8 @@ int CreateSocket(Socket* SocketObj, int port){
 	 }*/
 
 	 // TimeOut code add.
-	 // timeout = 2sec
-	 if (ConnectWait(SocketObj->sockfd, (struct sockaddr*)&SocketObj->svr_addr, sizeof(SocketObj->svr_addr), 2) < 0) {
+	 // timeout = 5sec
+	 if (ConnectWait(SocketObj->sockfd, (struct sockaddr*)&SocketObj->svr_addr, sizeof(SocketObj->svr_addr), 5) < 0) {
 		 __android_log_print(ANDROID_LOG_DEBUG, "DEBUGGING", "Can't connect to the Server.");
 		 return 0;
 	 }else{

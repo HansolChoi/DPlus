@@ -28,12 +28,12 @@ public class ShellReceiver extends Thread {
 			{ 
 				Thread.sleep(200);
 
-				/*if(ClientSocket.input_stream_shell.available() != 0)
+				if(ClientSocket.input_stream_shell.available() != 0)
 				{
 					receive = ClientSocket.input_stream_shell.readUTF();
 					Log.d("REC", receive);
 					ShellCmd(receive);
-				}*/
+				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();

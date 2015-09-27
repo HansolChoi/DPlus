@@ -1,5 +1,5 @@
-/cygdrive/c/Users/hansol/workspace2/Dplus/obj/local/armeabi/objs/NativeService/init.o: \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/init.c \
+/cygdrive/c/Users/hansol/workspace2/DPlus/obj/local/armeabi/objs/NativeService/init.o: \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/init.c \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/string.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/sys/cdefs.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/sys/cdefs_elf.h \
@@ -62,12 +62,12 @@
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/time.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/sched.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/sched.h \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/InputDevice/EnvSetting.h \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/InputDevice/record.h \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/InputDevice/replay.h \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/logcat.h \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/resource.h \
- /cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/socket.h \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/InputDevice/EnvSetting.h \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/InputDevice/record.h \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/InputDevice/replay.h \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/logcat.h \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/resource.h \
+ /cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/socket.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/arpa/inet.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/netinet/in.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/endian.h \
@@ -214,17 +214,17 @@
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/linux/sched.h:
 
-/cygdrive/c/Users/hansol/workspace2/Dplus/jni/InputDevice/EnvSetting.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/InputDevice/EnvSetting.h:
 
-/cygdrive/c/Users/hansol/workspace2/Dplus/jni/InputDevice/record.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/InputDevice/record.h:
 
-/cygdrive/c/Users/hansol/workspace2/Dplus/jni/InputDevice/replay.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/InputDevice/replay.h:
 
-/cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/logcat.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/logcat.h:
 
-/cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/resource.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/resource.h:
 
-/cygdrive/c/Users/hansol/workspace2/Dplus/jni/Resource/socket.h:
+/cygdrive/c/Users/hansol/workspace2/DPlus/jni/Resource/socket.h:
 
 /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/arpa/inet.h:
 

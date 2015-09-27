@@ -1,13 +1,17 @@
 package Socket;
 
 import MonkeyTest.MonkeyResult;
+import android.content.Context;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.*;
 
+import Socket.ClientSocket;
 import dplus.MainActivity;
 
 public class FileReceiver extends Thread {
@@ -16,9 +20,11 @@ public class FileReceiver extends Thread {
 	String package_name;
 
 	public static final int FULL_LIVE_TIME = 100;
-
 	public int liveTime = 100;
+	public final String RecordFile = "sdcard/events.txt";
+	private static Context mContext;
 
+	
 	public static ClientSocket singleton_socket = ClientSocket.getInstance();
 
 	public void chargeLiveTime() {
@@ -31,7 +37,7 @@ public class FileReceiver extends Thread {
 			Handler handler = new Handler(Looper.getMainLooper());
 			handler.post(new Runnable() {
 				public void run() {
-					MainActivity.server_status.setText("¿¬°áµÊ(" + liveTime + ")");
+					MainActivity.server_status.setText("ì—°ê²°ë¨(" + liveTime + ")");
 				}
 			});
 		} catch (Exception e) {
@@ -44,14 +50,13 @@ public class FileReceiver extends Thread {
 	public void run() {
 		while (ClientSocket.isConnected == true) {
 			try {
-				singleton_socket.ndk_instance.nativewaitpid();
 				// socket input stream check
 				if (!consumeLiveTime()) {
 					try {
 						Handler handler = new Handler(Looper.getMainLooper());
 						handler.post(new Runnable() {
 							public void run() {
-								MainActivity.server_status.setText("¼­¹ö ÀÀ´ä¾øÀ½");
+								MainActivity.server_status.setText("ì„œë²„ ì‘ë‹µì—†ìŒ");
 							}
 						});
 					} catch (Exception e) {
@@ -61,8 +66,7 @@ public class FileReceiver extends Thread {
 				}
 				if (ClientSocket.input_stream_connect.available() != 0) {
 					data_connect = ClientSocket.input_stream_connect.readUTF();
-					Log.d("connect socket", data_connect);
-					
+					Log.d("bomb", "data_apk_monkey : " + data_connect);
 					if (data_connect.equals("-ConnectionTest-")) {					
 						chargeLiveTime();
 						ClientSocket.output_stream_connect.writeUTF("alive");
@@ -72,7 +76,7 @@ public class FileReceiver extends Thread {
 							Handler handler = new Handler(Looper.getMainLooper());
 							handler.post(new Runnable() {
 								public void run() {
-									MainActivity.server_status.setText("¼­¹ö Á¾·á");
+									MainActivity.server_status.setText("ì„œë²„ ì¢…ë£Œ");
 								}
 							});
 						} catch (Exception e) {
@@ -83,12 +87,9 @@ public class FileReceiver extends Thread {
 					}
 				}
 
-				// ndk resource output
-				if (singleton_socket.ndk_instance.SocketAvailable != 0) {
-					singleton_socket.ndk_instance.nativeResourceTransfer();
-					singleton_socket.ndk_instance.Display();
+				if(singleton_socket.native_obj.SocketAvailable != 0){
+					singleton_socket.native_obj.Display();
 				}
-				
 				// apk_monkey input stream check
 				if (ClientSocket.input_stream_apk_monkey.available() != 0) {
 					data_apk_monkey = ClientSocket.input_stream_apk_monkey
@@ -97,23 +98,60 @@ public class FileReceiver extends Thread {
 					// monkey test input
 					Log.d("bomb", "data_apk_monkey : " + data_apk_monkey);
 					if (data_apk_monkey.equals("-SendMonkeyTestCmd-")) {
+						MainActivity.toast("Monkey-Test start!");
 						Call_Monkey_Command();
 					}
 					// apk install input
 					else if (data_apk_monkey.equals("-SendAPK-")) {
+						MainActivity.toast("Install APK!");
 						Apk_Receiver();
 						// install
 						Apk_Install();
 						// execute
 						Apk_Execute();
 					} else if (data_apk_monkey.equals("-PlayAutoInputTest-")) {
-
+						MainActivity.toast("PlayAutoInputTest!");
 						
-					}else if(data_apk_monkey.equals("-RecordStart-")){
+						int Origin_Width = ClientSocket.input_stream_apk_monkey
+								.readInt();
+						int Origin_Height = ClientSocket.input_stream_apk_monkey
+								.readInt();	
+						long full = ClientSocket.input_stream_apk_monkey
+								.readLong();
+						
+						int Device_Width = MainActivity.ScreenWidth;
+						int Device_Height = MainActivity.ScreenHeight;
+						//81.7kb
+						// íŒŒì¼ ì €ìž¥.
+						File f = new File(RecordFile);
+						BufferedOutputStream bos = new BufferedOutputStream(
+								new FileOutputStream(f));
+						
+						// ë°”ì´íŠ¸ ë°ì´í„°ë¥¼ ì „ì†¡ë°›ìœ¼ë©´ì„œ ê¸°ë¡
+						int len, size = 32768;
+						byte[] data = new byte[size];
+						while (full > 0) {
+							len = ClientSocket.input_stream_apk_monkey
+									.read(data);
+							bos.write(data, 0, len);
+							full -= len;
+						}
+						bos.flush();
+						bos.close();
+						
+						singleton_socket.native_obj.PlayInputTest(Origin_Width, Origin_Height, Device_Width, Device_Height);
 
-
-					}else if(data_apk_monkey.equals("-RecordStop-")){
-
+						MainActivity.toast("PlayAutoInputTest Stop!");
+					}else if(data_apk_monkey.equals("-StartAutoInput-")){
+						MainActivity.toast("Recodring start!");
+						
+						singleton_socket.native_obj.RecordStart(MainActivity.ScreenWidth, MainActivity.ScreenHeight);
+					}else if(data_apk_monkey.equals("-StopAutoInput-")){
+						// ì¤‘ì§€
+						singleton_socket.native_obj.RecordStop();
+						
+						SendRecordFile(MainActivity.ScreenWidth, MainActivity.ScreenHeight);
+						MainActivity.toast("Recodring stop!");
 					}
 				}
 				Thread.sleep(200);
@@ -228,4 +266,44 @@ public class FileReceiver extends Thread {
 		}
 	}
 
+    public void SendRecordFile(int Width, int Height) {
+        new Thread(new SendRecordFileThread(Width, Height)).start();
+    }
+
+	public class SendRecordFileThread implements Runnable
+	{
+		 String path;
+	     BufferedInputStream bis;
+	     int ScreenWidth, ScreenHeight;
+	     SendRecordFileThread(int width, int height){
+	    	 path = RecordFile;
+	         ScreenWidth = width;
+	         ScreenHeight = height;
+	     }
+	     @Override
+	     public void run() {
+	    	 try {
+	    		 File f = new File(path);
+	             bis=new BufferedInputStream(new FileInputStream(f));
+	             singleton_socket.output_stream_apk_monkey.writeUTF("-SendRecordFile-");
+	             singleton_socket.output_stream_apk_monkey.flush();
+	             singleton_socket.output_stream_apk_monkey.writeInt(ScreenWidth);
+	             singleton_socket.output_stream_apk_monkey.flush();
+	             singleton_socket.output_stream_apk_monkey.writeInt(ScreenHeight);
+	             singleton_socket.output_stream_apk_monkey.flush();
+	             singleton_socket.output_stream_apk_monkey.writeLong(f.length());
+	             singleton_socket.output_stream_apk_monkey.flush();
+	             int len, size = 32768, sum = 0;
+	             byte[] data = new byte[size];
+	             while ((len = bis.read(data)) != -1) {
+	            	 sum += len;
+	                 singleton_socket.output_stream_apk_monkey.write(data, 0, len);
+	             }
+	             singleton_socket.output_stream_apk_monkey.flush();
+	             bis.close();
+	    	 } catch (Exception e) {
+	                e.printStackTrace();
+	         }
+	    }
+	 } 
 }

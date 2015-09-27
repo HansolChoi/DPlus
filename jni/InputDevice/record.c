@@ -15,24 +15,27 @@
 
 #define STORAGE_PATH	"/sdcard/events.txt"
 
+int event_fd = -1;
+int record_fd = -1;
 /*
  * 이벤트 디바이스에서 입력을 읽어온다.
  */
-void Record(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight )
+
+void Record(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight, int* loop)
 {
-	int event_fd = -1;
-	int record_fd = -1;
 	int num;
 	struct input_event event;
 	char data[200];
 
 	// 녹화용 파일 만들기
-	// ** 녹화한 파일에 mode를 설정해주지 않으면, 다른 사용자는 또 루트권한으로 열어야되.
-	if((record_fd = open(STORAGE_PATH, O_RDWR | O_CREAT)) < 0)
+	system("su rm -f /sdcard/events.txt");
+
+	if((record_fd = creat(STORAGE_PATH, 0777)) < 0)
 	{
-		LOG(I, "Record", "%s : open error", STORAGE_PATH);
+		LOG(I, "Record", "%s : creat error", STORAGE_PATH);
 		return;
 	}
+	LOG(I, "Record", "%s : creat success!", STORAGE_PATH);
 
 	if((event_fd = open(EventPath, O_RDONLY)) < 0)
 	{
@@ -40,11 +43,11 @@ void Record(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight 
 		close(record_fd);
 		return;
 	}
-	//sprintf(data, "%d %d\n", ScreenWidth, ScreenHeight);
-	//write(record_fd, data, strlen(data)); // 해상도 입력
 
+	LOG(I, "Record", "이벤트 읽을 준비 완료!");
 	while(*flag)
 	{
+		*loop = 1;
 		num = read(event_fd, &event, (sizeof(event)));
 		LOG(I, "Record", "type : %d, code : %d, value : %d", event.type, event.code, event.value);
 
@@ -62,4 +65,5 @@ void Record(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight 
 	LOG(I, "Record", "Record exit");
 	close(event_fd);
 	close(record_fd);
+	*loop = 0;
 }
