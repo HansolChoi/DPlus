@@ -1,5 +1,5 @@
-/cygdrive/c/Users/hansol/workspace2/DPlus/obj/local/armeabi/objs/NativeService/InputDevice/record.o: \
- /cygdrive/c/Users/hansol/workspace2/DPlus/jni/InputDevice/record.c \
+/cygdrive/c/Users/hansol/workspace2/Dplus/obj/local/armeabi/objs/NativeService/InputDevice/record.o: \
+ /cygdrive/c/Users/hansol/workspace2/Dplus/jni/InputDevice/record.c \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/stdio.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/sys/cdefs.h \
  /home/hansol/android-ndk-r10e/platforms/android-21/arch-arm/usr/include/sys/cdefs_elf.h \

@@ -71,13 +71,13 @@ public class ClientSocket {
         	port                    = 5555;
             socket_connect          = new Socket();
             socket_apk_monkey       = new Socket();
-            //socket_shell			= new Socket();
+            socket_shell			= new Socket();
             native_obj				= new NativeService();
 
             // socket connected
             socket_connect          .connect((new InetSocketAddress(m_ip, 5555)), 5000);
             socket_apk_monkey       .connect((new InetSocketAddress(m_ip, 5557)), 5000);
-            //socket_shell			.connect((new InetSocketAddress(m_ip, 5559)), 2000);
+            socket_shell			.connect((new InetSocketAddress(m_ip, 5559)), 2000);
             
             native_obj.nativeSocketInit(m_ip);
             native_obj.SocketAvailable = 1;
@@ -85,12 +85,12 @@ public class ClientSocket {
             // input stream interlocked
             input_stream_connect            = new DataInputStream(socket_connect.getInputStream());
             input_stream_apk_monkey         = new DataInputStream(socket_apk_monkey.getInputStream());
-            //input_stream_shell				= new DataInputStream(socket_shell.getInputStream());
+            input_stream_shell				= new DataInputStream(socket_shell.getInputStream());
             
             // output stream interlocked
             output_stream_connect           = new DataOutputStream(socket_connect.getOutputStream());
             output_stream_apk_monkey        = new DataOutputStream(socket_apk_monkey.getOutputStream());
-            //output_stream_shell			= new DataOutputStream(socket_shell.getOutputStream());
+            output_stream_shell			= new DataOutputStream(socket_shell.getOutputStream());
             
             // Device Name Transported
             Log.i("socket_opend()", "m_id : " + m_id);
@@ -124,12 +124,12 @@ public class ClientSocket {
             // input stream closed
             input_stream_connect.close();
             input_stream_apk_monkey.close();
-            //input_stream_shell.close();
+            input_stream_shell.close();
             
             // output stream closed
             output_stream_connect.close();
             output_stream_apk_monkey.close();
-            //output_stream_shell.close();
+            output_stream_shell.close();
             
             // NDK socket close
             
@@ -139,7 +139,7 @@ public class ClientSocket {
             // socket disconnected          
             socket_connect.close();
             socket_apk_monkey.close();
-            //socket_shell.close();
+            socket_shell.close();
         }
         catch (Exception e) {
             e.printStackTrace();

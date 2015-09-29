@@ -8,12 +8,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <linux/input.h>
+#include <sys/time.h>
 #include <jni.h>
 
 #define LOG	__android_log_print
 #define I	ANDROID_LOG_INFO
 
 #define STORAGE_PATH	"/sdcard/events.txt"
+#define TIMEOUT			1
 
 int event_fd = -1;
 int record_fd = -1;
@@ -23,9 +25,13 @@ int record_fd = -1;
 
 void Record(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight, int* loop)
 {
-	int num;
+	int len;
 	struct input_event event;
 	char data[200];
+
+	struct timeval tv;
+	fd_set readfds;
+	int ret;
 
 	// 녹화용 파일 만들기
 	system("su rm -f /sdcard/events.txt");
@@ -48,18 +54,43 @@ void Record(const char* EventPath, int* flag, int ScreenWidth, int ScreenHeight,
 	while(*flag)
 	{
 		*loop = 1;
-		num = read(event_fd, &event, (sizeof(event)));
-		LOG(I, "Record", "type : %d, code : %d, value : %d", event.type, event.code, event.value);
 
-		if(num != sizeof(event))
-		{
-			LOG(I, "Record", "read error");
+		/* event_fd에서 입력을 기다리기 위한 준비 */
+		FD_ZERO(&readfds);
+		FD_SET(event_fd, &readfds);
+
+		/* select가 1초 동안 기다리도록 timeval 구조체 결정 */
+		tv.tv_sec = TIMEOUT;
+		tv.tv_usec = 0;
+
+		ret = select(event_fd + 1,
+					&readfds,
+					NULL, NULL,
+					&tv);
+		if(ret == -1){
+			LOG(I, "Record", "select error");
 			break;
+		} else if(!ret){
+			LOG(I, "Record", "select timeout");
+			continue;
 		}
 
-		if( write(record_fd, &event, sizeof(event)) != sizeof(event)){
-			LOG(I, "Record", "write error");
-			break;
+		/* 파일디스크립터 읽기 가능 */
+
+		if(FD_ISSET(event_fd, &readfds)){
+			len = read(event_fd, &event, (sizeof(event)));
+
+			LOG(I, "Record", "type : %d, code : %d, value : %d", event.type, event.code, event.value);
+			if(len != sizeof(event))
+			{
+				LOG(I, "Record", "read error");
+				break;
+			}
+
+			if( write(record_fd, &event, sizeof(event)) != sizeof(event)){
+				LOG(I, "Record", "write error");
+				break;
+			}
 		}
 	}
 	LOG(I, "Record", "Record exit");

@@ -16,30 +16,29 @@
 #define STORAGE_PATH	"/sdcard/events.txt"
 
 int OriginWidth, OriginHeight, DeviceWidth, DeviceHeight;
+int EventNum = 0;
 
 void EventPos(struct input_event *event)
 {
-	if(event->type == EV_ABS){
-		if(event->code == ABS_MT_POSITION_X)
-		{
+	if(event->code == ABS_MT_POSITION_X)
+	{
 			event->value = event->value * DeviceWidth / OriginWidth;
-		}
-		else if(event->code == ABS_MT_POSITION_Y)
-		{
-			event->value = event->value * DeviceHeight / OriginHeight;
-		}
+	}
+	else if(event->code == ABS_MT_POSITION_Y)
+	{
+		event->value = event->value * DeviceHeight / OriginHeight;
 	}
 }
 
-void EventSet(struct input_event *event, int type, int code, int value)
+void EventAdd(int event_fd, struct input_event event, int stat)
 {
-	struct timeval now;
+	event.type = 1; event.code = 330; event.value = (stat == 1) ? 1 : 0;
 
-	gettimeofday(&now, NULL);
-	event->time = now;
-	event->type = type;
-	event->code = code;
-	event->value = value;
+	LOG(I, "EventAdd", "post - type : %d, code : %d, value : %d, num : %d", event.type, event.code, event.value, EventNum);
+	if(write(event_fd, &event, sizeof(event)) != sizeof(event)){
+		LOG(I, "Replay", "write error");
+		return;
+	}
 }
 
 void Replay(const char* EventPath, int* flag,
@@ -54,8 +53,12 @@ void Replay(const char* EventPath, int* flag,
 	int num_events;
 	struct stat statinfo;
 
+	int CodeAddStat = 0;
+
 	OriginWidth = _OriginWidth; OriginHeight = _OriginHeight;
 	DeviceWidth = _DeviceWidth; DeviceHeight = _DeviceHeight;
+
+	EventNum = 0;
 
 	LOG(I, "Replay", "replay start");
 
@@ -71,7 +74,8 @@ void Replay(const char* EventPath, int* flag,
 		return;
 	}
 
-	num_events = statinfo.st_size / (sizeof(struct input_event) + sizeof(int));
+	num_events = statinfo.st_size / (sizeof(struct input_event));
+	LOG(I, "Replay", "num_events : %d", num_events);
 
 	if((record_fd = open(STORAGE_PATH, O_RDONLY)) < 0)
 	{
@@ -92,7 +96,6 @@ void Replay(const char* EventPath, int* flag,
 			LOG(I, "Replay", "read error");
 			break;
 		}
-		LOG(I, "Replay", "pre - type : %d, code : %d value : %ld", event.type, event.code, event.value);
 
 		gettimeofday(&now, NULL);
 		if (!timerisset(&tdiff)) {
@@ -106,32 +109,27 @@ void Replay(const char* EventPath, int* flag,
 
 		event.time = tevent;
 
-		EventPos(&event);
+		// 상위버전의 최소조건 프로토콜로 변환이 필요한가?
+		if(event.type == EV_ABS && event.code == ABS_MT_TRACKING_ID && CodeAddStat == 0 ){
+			CodeAddStat = (event.value >= 0) ? 1 : 2;
+		}
+		else if(CodeAddStat > 0 && event.type != 1){
+			EventAdd(event_fd, event, CodeAddStat);
+			CodeAddStat = 0;
+		}else if(CodeAddStat > 0 && event.type == 1){
+			CodeAddStat = 0;
+		}
 
-		//LOG(I, "Replay", "post - type : %d, code : %d value : %d", event.type, event.code, event.value);
+		if(event.type == EV_ABS && ( event.code == ABS_MT_POSITION_X || event.code == ABS_MT_POSITION_Y ))
+			EventPos(&event);
+
+		LOG(I, "Replay", "post - type : %d, code : %d, value : %d, num : %d", event.type, event.code, event.value, ++EventNum);
 		if(write(event_fd, &event, sizeof(event)) != sizeof(event)){
 			LOG(I, "Replay", "write error");
 			break;
 		}
 	}
 
-	/*EventSet(&event, EV_SYN, 0 , 0);
-	if(write(event_fd, &event, sizeof(event)) != sizeof(event)){
-		LOG(I, "Replay", "write error");
-	}
-	LOG(I, "Replay", "write Sync");
-
-	EventSet(&event, EV_KEY, 330, 0);
-	if(write(event_fd, &event, sizeof(event)) != sizeof(event)){
-		LOG(I, "Replay", "write error");
-	}
-	LOG(I, "Replay", "write up");
-
-	EventSet(&event, EV_SYN, 0 , 0);
-	if(write(event_fd, &event, sizeof(event)) != sizeof(event)){
-		LOG(I, "Replay", "write error");
-	}
-	LOG(I, "Replay", "write Sync");*/
 	close(event_fd);
 	close(record_fd);
 	LOG(I, "Replay", "replay stop");
