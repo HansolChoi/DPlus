@@ -1,7 +1,7 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-int MatchingEventDevice();
+int MatchingInputDevice(const char* find);
 void EventDeviceAuthorityChange(JNIEnv* env, const char* file);
 
 void JavaShellEnv(JNIEnv* env);

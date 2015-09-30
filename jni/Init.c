@@ -68,9 +68,9 @@ void RecordStart(JNIEnv *R_Env, jobject thiz, jint Width, jint Height)
 	int  EventNumber;
 
 	/**/
-	EventNumber = MatchingEventDevice();
+	EventNumber = MatchingInputDevice("sec_touchscreen");
 	sprintf(EventFileName, "/dev/input/event%d", EventNumber);
-	LOG(I, "SocketsInitCall", "%s", EventFileName);
+	LOG(I, "RecordStart", "%s", EventFileName);
 	EventDeviceAuthorityChange(env, EventFileName);
 	/* */
 
@@ -101,9 +101,9 @@ void PlayInputTest(JNIEnv *R_Env, jobject thiz, jint Origin_Width, jint Origin_H
 	DeviceWidth = Device_Width; DeviceHeight = Device_Height;
 
 	/* */
-	EventNumber = MatchingEventDevice();
+	EventNumber = MatchingInputDevice("sec_touchscreen");
 	sprintf(EventFileName, "/dev/input/event%d", EventNumber);
-	LOG(I, "SocketsInitCall", "%s", EventFileName);
+	LOG(I, "PlayInputTest", "%s", EventFileName);
 	EventDeviceAuthorityChange(env, EventFileName);
 	/* */
 
@@ -127,7 +127,7 @@ void SocketsInitCall(JNIEnv *R_Env, jobject thiz, jstring jip)
 	LOG(I, "SocketsInitCall", "SocketsInit(ip)\n");
 	SocketThreadFlag = 1;
 
-	EventNumber = MatchingEventDevice();
+	EventNumber = MatchingInputDevice("sec_touchscreen");
 	sprintf(EventFileName, "/dev/input/event%d", EventNumber);
 	LOG(I, "SocketsInitCall", "%s", EventFileName);
 	EventDeviceAuthorityChange(env, EventFileName);

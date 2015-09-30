@@ -13,43 +13,65 @@
 #include "record.h"
 
 #define LOG	__android_log_print
+#define I	ANDROID_LOG_INFO
 
 jclass sh_cls;
 jmethodID func;
 jobject sh_obj;
 
 /*
- * 터치스크린 장치와 이벤트 장치를 매칭시킨다.
+ * 입력 장치와 이벤트 장치를 매칭시킨다.
  */
-int MatchingEventDevice()
+int MatchingInputDevice(const char* find)
 {
 	FILE *MatchingFile = NULL;
-	char Line[300];
-	int idx, res = -1;
+	char Line[300], Comp[300];
+	int i, number = 0;
+	int chip = 0;
+	int ExpOfTen[2] = {1, 10};
+	char* pre_cmd = "N: Name=\"";
+	char* post_cmd = "\"\n";
+
+	for(i=0; i<300; i++)
+		Line[i] = Comp[i] = 0;
+
+	strcat(Comp, pre_cmd);
+	strcat(Comp, find);
+	strcat(Comp, post_cmd);
+
+	LOG(I, "MatchingInputDevice", "Comp : %s", Comp);
 
 	MatchingFile = fopen("/proc/bus/input/devices", "r");
 
 	if(MatchingFile == NULL)
 	{
-		LOG(ANDROID_LOG_INFO, "NATIVE", "MatchingFile opennig fail.");
+		LOG(ANDROID_LOG_INFO, "MatchingEventDevice", "MatchingFile opennig fail.");
 		return;
 	}
 
 	while(!feof(MatchingFile))
 	{
 		fgets(Line, sizeof(Line), MatchingFile);
-		if(strcmp(Line, "N: Name=\"sec_touchscreen\"\n") == 0)
+		if(strcmp(Line, Comp) == 0)
 		{
-			for(idx=0; idx < 4; idx++)
+			for(i=0; i < 4; i++)
 				fgets(Line, sizeof(Line), MatchingFile);
 
-			LOG(ANDROID_LOG_INFO, "NATIVE", "%s", Line);
-			res = Line[17] - '0'; break;
+			LOG(ANDROID_LOG_INFO, "MatchingEventDevice", "%s", Line);
+			for(i=0; Line[i] != '\0'; i++)
+			{
+				if(Line[i] >= '0' && Line[i] <= '9')
+				{
+					number *= ExpOfTen[chip++];
+					number += (Line[i] - '0');
+				}
+			}
+			break;
 		}
 	}
 
 	fclose(MatchingFile);
-	return res;
+	return number;
 }
 
 /*
